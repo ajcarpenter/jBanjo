@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Game</title>
+
+	<!-- Libraries -->
+	<script src="js/engine/jquery-1.8.3.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/engine/sylvester.src.js" type="text/javascript" charset="UTF-8"></script>
+
+	<script src="js/engine/quadtree.js" type="text/javascript" charset="UTF-8"></script>
+
+	<script type="text/javascript" charset="UTF-8">
+		var qt = new QuadTree(new AABB($V([0,0]),$V([1000,1000])));
+		var ctx;
+		
+		$(document).ready(function(){
+			ctx = $('canvas')[0].getContext('2d');
+		});
+
+		var addPoint = function(e){
+			e.preventDefault();
+
+			var p = $V([parseFloat($('#x').val()),parseFloat($('#y').val())]);
+
+			qt.insert({point:p,gameObject:null});
+
+
+			var pointsInRange = qt.queryRange(qt.boundary);
+
+			ctx.clearRect(0,0,1000,1000);
+			for(var i = 0; i < pointsInRange.length;i++)
+			{
+				var p = pointsInRange[i].point;
+
+				ctx.fillRect(((p.elements[0] + 1000) / 2),((p.elements[1] + 1000) / 2),5,5);
+			}
+		};
+	</script>
+
+	</head>
+<body>
+
+<div>
+	<form onsubmit="addPoint(event)">
+		<input type="text" id="x" />
+		<input type="text" id="y" />
+		<input type="submit" />
+	</form>
+	<canvas width="1000px" height="1000px"></canvas>
+</div>
+
+
+</body>
+</html>
