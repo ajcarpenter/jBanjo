@@ -65,7 +65,7 @@ var GameObject = function(){
 				for(var i = 0; i < this.components.length; i++)
 				{
 					if(this.components[i].start)
-						this.components[i].start();
+						this.components[i].start(this);
 				}
 
 				for(var i = 0; i < this.childObjects.length; i++)

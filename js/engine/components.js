@@ -196,6 +196,7 @@ var Script = function(){
 		},
 		script:null,
 		update:function(){},
+		start:function(){},
 		type:ComponentType.Script
 	};
 

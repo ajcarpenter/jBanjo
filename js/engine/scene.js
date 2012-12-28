@@ -50,16 +50,10 @@ var Scene = function(){
 				}
 			},
 			registerLoad:function(loadedObject){
-				for(var i in this.loading)
-				{
-					if(this.loading[i] == loadedObject)
-					{
-						this.loading.splice(i,1);
-					}
+				this.loading.splice(this.loading.indexOf(loadedObject),1);
 
-					if(this.loading.length === 0)
-						this.loadInitiator.start();
-				}
+				if(this.loading.length === 0)
+					this.loadInitiator.start();
 			}
 	};
 	

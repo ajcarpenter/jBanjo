@@ -165,3 +165,7 @@ pip-log.txt
 
 # Copyrighted sprites
 sprites/
+
+# Sublime Text files
+*.sublime-project
+*.sublime-workspace
