@@ -6,6 +6,9 @@ var Level = function(){
 			layers:[
 				layer:{
 					zindex:
+					parallaxScale:$([1,1]),
+					repeatX:false,
+					repeatY:false,
 					tiles:[
 						{
 							x:

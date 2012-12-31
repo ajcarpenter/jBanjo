@@ -1,9 +1,9 @@
 var Engine = function(){
-	var Engine = function(canvas,scenes){
+	var Engine = function(canvas,scenes,loadingScene){
 		this.scenes = scenes;
 		this.GameTime.start();
 		this.renderer = new Renderer(canvas.getContext('2d'),canvas.height,canvas.width);
-		this.loop = new GameLoop(this.renderer,this.resourceManager,this.GameTime,scenes[0]);
+		this.loop = new GameLoop(this.renderer,this.resourceManager,this.GameTime,scenes[0],loadingScene);
 	};
 	
 	Engine.prototype = {

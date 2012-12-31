@@ -14,7 +14,7 @@ var GameObject = function(){
 			
 			for(var i = 0; i < prefab.components.length; i++)
 			{
-				this.components[i] = prefab.components[i].instantiate(paramMap[prefab.components[i].type],this);
+				this.components[i] = prefab.components[i].instantiate(this,paramMap[prefab.components[i].type],this);
 				this[this.components[i].type] = this.components[i]; //Alias
 			}
 
@@ -35,7 +35,7 @@ var GameObject = function(){
 				for(var i = 0; i < this.components.length; i++)
 				{
 					if(this.components[i].update)
-						this.components[i].update(this,gameTime,collisionQT);
+						this.components[i].update(gameTime,collisionQT);
 				}
 
 				for(var i = 0; i < this.childObjects.length; i++)
@@ -97,17 +97,10 @@ var GameObject = function(){
 				}
 			},
 			registerLoad:function(loadedObject){
-				for(var i in this.loading)
-				{
-					if(this.loading[i] == loadedObject)
-					{
-						this.loading.splice(i,1);
-					}
+				this.loading.splice(this.loading.indexOf(loadedObject),1);
 
-					if(this.loading.length === 0)
-						this.loadInitiator.registerLoad(this);
-				}
-
+				if(this.loading.length === 0)
+					this.loadInitiator.registerLoad(this);
 			}
 
 	};

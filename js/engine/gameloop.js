@@ -1,10 +1,11 @@
 //Load/Unload scenes
 //Start/Stop
 var GameLoop = function(){
-	var GameLoop = function(renderer,resourceManager,gameTime,scene){
+	var GameLoop = function(renderer,resourceManager,gameTime,scene,loadingScene){
 		this.renderer = renderer;
 		this.resourceManager = resourceManager;
 		this.gameTime = gameTime;
+		this.loadingScene = loadingScene;
 
 		this.loadScene(scene);
 	};
@@ -38,12 +39,21 @@ var GameLoop = function(){
 				this.scene.draw(drawBatch);
 		},
 		loadScene:function(scene){
-			this.scene = scene;			
+			this.loaded = false;
+
+			this.loadingScene.load(this);		
 			scene.load(this);
 		},
-		start:function(){
-			scene.start();
-			this.loop();
+		start:function(scene){
+			if(!this.loaded)
+			{
+				if(scene != this.loadingScene)
+					this.loaded = true;
+
+				this.scene = scene;
+				scene.start();
+				this.loop();
+			}
 		}
 	};
 

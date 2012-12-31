@@ -12,15 +12,17 @@ var ComponentType = {
 };
 
 var Component = function(){
-	var Component = function(paramMap){
-		return this;
+	var Component = function(parent,paramMap){
+		this.parent = parent;
 	};
 	
 	Component.prototype = {
+		//TODO:Store owning gameobject somewhere
+		gameObject:null,
 		type:null,
 		enabled:true,
-		instantiate:function(paramMap){
-			return new Component(paramMap);
+		instantiate:function(parent,paramMap){
+			return new Component(parent,paramMap);
 		}
 	};
 	
@@ -29,24 +31,26 @@ var Component = function(){
 
 //
 var Transform = function(){
-	var Transform = function(paramMap){
+	var Transform = function(parent,paramMap){
+		this._super(parent,paramMap);
+
 		if(paramMap)
 		{
-			this.position = paramMap.position || $V([0,0,0]);
+			this.position = paramMap.position || $V([0,0]);
 			this.scale = paramMap.scale || $V([1,1]);
-			this.rotation = paramMap.rotation || 0;
+			this.rotation = paramMap.rotation || 0; //radians
 		}
 		else
 		{
-			this.position = $V([0,0,0]);
+			this.position = $V([0,0]);
 			this.scale = $V([1,1]);
 			this.rotation = 0;
 		}
 	};
 	
 	Transform.prototype = {
-		instantiate:function(paramMap){
-			return new Transform(paramMap);
+		instantiate:function(parent,paramMap){
+			return new Transform(parent,paramMap);
 		},
 		type:ComponentType.Transform,
 		position:null,
@@ -55,8 +59,9 @@ var Transform = function(){
 		toWorld:function(parentTransform){
 			//TODO: Fix this
 			var pos = this.position.add(parentTransform.position);
+			var rot = this.rotation + parentTransform.rotation;
 
-			return new Transform({position:pos});
+			return new Transform(null,{position:pos,rotation:rot});
 		}
 	};
 
@@ -81,7 +86,7 @@ var Renderer = function(){
 }();
 
 var SpriteRenderer = function(){
-	var SpriteRenderer = function(paramMap){
+	var SpriteRenderer = function(parent,paramMap){
 		if(paramMap)
 		{
 			this.zindex = paramMap.zindex;
@@ -93,8 +98,8 @@ var SpriteRenderer = function(){
 	};
 	
 	SpriteRenderer.prototype = {
-		instantiate:function(paramMap){
-			return new SpriteRenderer(paramMap);
+		instantiate:function(parent,paramMap){
+			return new SpriteRenderer(parent,paramMap);
 		},
 		type:ComponentType.SpriteRenderer,
 		spriteSheet:null,
@@ -182,17 +187,29 @@ var AudioEmitter = function(){
 
 //Scripting
 var Script = function(){
-	var Script = function(paramMap){
+	var Script = function(parent,paramMap){
+		this._super(parent,paramMap);
+		
 		if(paramMap)
 		{
-			this.update = paramMap.update;
-			this.start = paramMap.start;
+			for(var i in paramMap)
+			{
+				this[i] = paramMap[i];
+			}
+
+			if(paramMap.listeners)
+			{
+				for(var i in paramMap.listeners)
+				{
+					Messenger.addListener(paramMap.listeners[i].signature,this[paramMap.listeners[i].func],this);
+				}
+			}
 		}
 	};
 
 	Script.prototype = {
-		instantiate:function(paramMap){
-			return new Script(paramMap);
+		instantiate:function(parent,paramMap){
+			return new Script(parent,paramMap);
 		},
 		script:null,
 		update:function(){},
@@ -207,14 +224,17 @@ var Script = function(){
 
 //Cameras
 var Camera = function(){
-	var Camera = function(){
-
+	var Camera = function(parent,paramMap){
+		this._super(parent,paramMap);
 	};
 
 	Camera.prototype = {
 		AABB:null,
 		viewportSize:$V([1920,1080]),
-		type:ComponentType.Camera
+		type:ComponentType.Camera,
+		instantiate:function(parent,paramMap){
+			return new Camera(parent,paramMap);
+		}
 	};
 
 	_inherit(Camera,Component);
@@ -224,7 +244,7 @@ var Camera = function(){
 
 //Animations
 var Animation = function(){
-	var Animation = function(paramMap){
+	var Animation = function(parent,paramMap){
 		if(paramMap)
 		{
 			this.componentType = paramMap.componentType;
@@ -237,8 +257,8 @@ var Animation = function(){
 	};
 
 	Animation.prototype = {
-		instantiate:function(paramMap){
-			return new Animation(paramMap);
+		instantiate:function(parent,paramMap){
+			return new Animation(parent,paramMap);
 		},
 		type:ComponentType.Animation,
 		length:null,

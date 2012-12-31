@@ -32,6 +32,7 @@ var Scene = function(){
 			load:function(loadInitiator){
 				this.loading = [];
 				this.loadInitiator = loadInitiator;
+				this.loadingCount = 0;
 
 				for(var i = 0; i < this.gameObjects.length; i++)
 				{
@@ -39,6 +40,7 @@ var Scene = function(){
 					{
 						this.gameObjects[i].load(this);
 						this.loading.push(this.gameObjects[i]);
+						this.loadingCount++;
 					}
 				}	
 			},
@@ -52,8 +54,11 @@ var Scene = function(){
 			registerLoad:function(loadedObject){
 				this.loading.splice(this.loading.indexOf(loadedObject),1);
 
+				var loadProgress = 1 - (this.loading.length / this.loadingCount);
+				Messenger.broadcast('loadProgress',loadProgress);
+
 				if(this.loading.length === 0)
-					this.loadInitiator.start();
+					this.loadInitiator.start(this);
 			}
 	};
 	
