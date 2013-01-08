@@ -8,7 +8,7 @@ var Renderer = function(){
 	Renderer.prototype = {
 		draw:function(drawBatch){
 			var cameraObj = drawBatch.camera;
-			var viewportSize = cameraObj.camera.viewportSize;
+			var zoom = cameraObj.camera.zoom;
 
 			var cameraOffsetX = cameraObj.transform.position.e(1);
 			var cameraOffsetY = cameraObj.transform.position.e(2);
@@ -19,15 +19,11 @@ var Renderer = function(){
 
 			//Rotate around centre
 			this.context.translate(this.width / 2,this.height / 2);
+			this.context.scale(zoom.e(1),zoom.e(2));
 			this.context.rotate(cameraObj.transform.rotation);
 			this.context.translate(-this.width / 2,-this.height / 2);
 
-
-
 			this.context.translate(-cameraOffsetX,-cameraOffsetY);
-
-
-			
 
 			for(var i in drawBatch.objects)
 			{
@@ -40,6 +36,11 @@ var Renderer = function(){
 						drawBatch.objects[i][j].trans.position.e(2)
 					);
 					
+					this.context.scale(
+						drawBatch.objects[i][j].trans.scale.e(1),
+						drawBatch.objects[i][j].trans.scale.e(2)
+					);
+
 					this.context.rotate(drawBatch.objects[i][j].trans.rotation);
 					
 					this.context.translate(

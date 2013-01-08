@@ -3,6 +3,8 @@ var Prefab = function(){
 		this.components = new Array();
 		this.childObjects = new Array();
 
+		this.drawable = [];
+
 		if(components)
 		{
 			for(var i = 0; i < components.length; i++)
@@ -18,9 +20,9 @@ var Prefab = function(){
 	};
 	
 	Prefab.prototype = {
-		components:[],
-		childObjects:[],
-		drawable:false,
+		components:null,
+		childObjects:null,
+		drawable:null,
 		updateable:false,
 		loadable:false,
 		startable:false,
@@ -42,8 +44,8 @@ var Prefab = function(){
 			if(!this.updateable && component.update)
 				this.updateable = true;
 
-			if(!this.drawable && component.draw)
-				this.drawable = true;
+			if(component.draw)
+				this.drawable.push(component);
 
 			if(!this.loadable && component.load)
 				this.loadable = true;
@@ -55,6 +57,8 @@ var Prefab = function(){
 				this.stoppable = true;
 
 			this.components.push(component);
+
+			return component;
 		},
 		disableComponent:function(i)
 		{

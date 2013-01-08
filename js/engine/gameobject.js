@@ -4,18 +4,15 @@ var GameObject = function(){
 		this.components = [];
 		this.childObjects = [];
 
+		this.drawable = [];
+
 		if(prefab)
 		{
 			this.prefab = prefab;
-			this.updateable = prefab.updateable;
-			this.drawable = prefab.drawable;
-			this.loadable = prefab.loadable;
-			this.startable = prefab.startable;
-			
+
 			for(var i = 0; i < prefab.components.length; i++)
 			{
-				this.components[i] = prefab.components[i].instantiate(this,paramMap[prefab.components[i].type],this);
-				this[this.components[i].type] = this.components[i]; //Alias
+				this[prefab.components[i].type] = this.addComponent(prefab.components[i].instantiate(this,paramMap[prefab.components[i].type],this));
 			}
 
 			for(var i = 0; i < prefab.childObjects.length; i++)
@@ -25,37 +22,35 @@ var GameObject = function(){
 		}
 		else
 		{
-			this[ComponentType.Transform] = new Transform();
-			this.components = [this[ComponentType.Transform]];
+			this[ComponentType.Transform] = this.addComponent(new Transform());
 		}
 	};
 	
 	GameObject.prototype = {
-			update:function(gameTime,collisionQT){
+			update:function(gameTime,collisionTree){
 				for(var i = 0; i < this.components.length; i++)
 				{
 					if(this.components[i].update)
-						this.components[i].update(gameTime,collisionQT);
+						this.components[i].update(gameTime,collisionTree);
 				}
 
 				for(var i = 0; i < this.childObjects.length; i++)
 				{
 					if(this.childObjects[i].updateable)
-						this.childObjects[i].update(gameTime,collisionQT);
+						this.childObjects[i].update(gameTime,collisionTree);
 				}
 			},
 			draw:function(drawBatch,parentTransform){
 				var trans = this.transform.toWorld(parentTransform);
 
-				for(var i = 0; i < this.components.length; i++)
+				for(var i = 0; i < this.drawable.length; i++)
 				{
-					if(this.components[i].draw)
-						this.components[i].draw(drawBatch,trans);
+					this.components[i].draw(drawBatch,trans);
 				}
 
 				for(var i = 0; i < this.childObjects.length; i++)
 				{
-					if(this.childObjects[i].drawable)
+					if(this.childObjects[i].drawable.length > 0)
 						this.childObjects[i].draw(drawBatch,trans);
 				}
 

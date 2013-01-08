@@ -60,8 +60,19 @@ var Transform = function(){
 			//TODO: Fix this
 			var pos = this.position.add(parentTransform.position);
 			var rot = this.rotation + parentTransform.rotation;
+			var scale = this.scale; //.x(parentTransform.scale);
 
-			return new Transform(null,{position:pos,rotation:rot});
+			return new Transform(null,{position:pos,rotation:rot,scale:scale});
+		},
+		setRotationFromVector:function(vector){
+			var angle = vector.angleFrom($V([0,-1]));
+
+			if(vector.e(1) < 0)
+				angle = (2 * Math.PI) - angle;
+
+			
+
+			this.rotation = angle;
 		}
 	};
 
@@ -72,8 +83,8 @@ var Transform = function(){
 
 //Renderers
 var Renderer = function(){
-	var Renderer = function(){
-		
+	var Renderer = function(parent,paramMap){
+		this._super(parent,paramMap);
 	};
 	
 	Renderer.prototype = {
@@ -87,6 +98,8 @@ var Renderer = function(){
 
 var SpriteRenderer = function(){
 	var SpriteRenderer = function(parent,paramMap){
+		this._super(parent,paramMap);
+
 		if(paramMap)
 		{
 			this.zindex = paramMap.zindex;
@@ -110,6 +123,7 @@ var SpriteRenderer = function(){
 		height:null,
 		src:null,
 		draw:function(drawBatch,transform){
+			
 			if(!drawBatch.objects[this.zindex])
 				drawBatch.objects[this.zindex] = [];
 
@@ -140,6 +154,9 @@ var SpriteRenderer = function(){
 				self.height = Math.floor(data.height / self.spriteSheetSize.y)
 				loadInitiator.registerLoad(self);
 			});
+		},
+		inView:function(){
+			return true;
 		}
 	};
 	
@@ -159,12 +176,35 @@ var ParticleRenderer = function(){
 
 //Colliders
 var Collider = function(){
-	var Collider = function(){
-		
+	var Collider = function(parent,paramMap){
+		this._super(parent,paramMap);
+
+		if(paramMap)
+		{
+			this.width = paramMap.width;
+			this.height = paramMap.height;
+		}
+
+
 	};
 	
 	Collider.prototype = {
-			
+		width:null,
+		height:null,
+		AABB:null,
+		update:function(gameTime,collisionTree){
+			if(!this.AABB)
+				this.AABB = new AABB(this.parent.transform.position,$V([this.width/2,this.height/2]));
+			else
+			{
+				this.AABB.center = this.parent.transform;
+			}
+
+			collisionTree.insert(this);
+		},
+		onAABBCollision:function(){
+
+		}
 	};
 	
 	_inherit(Collider,Component);
@@ -177,7 +217,20 @@ var SquareCollider = function(){
 }();
 
 var CircleCollider = function(){
+	var CircleCollider = function(parent,paramMap){
+		this._super(parent,paramMap);
+	};
+
+	CircleCollider.prototype = {
+		instantiate:function(parent,paramMap){
+			return new CircleCollider(parent,paramMap);
+		},
+		radius:null
+	};
 	
+	_inherit(CircleCollider,Component);
+
+	return CircleCollider;
 }();
 
 //Audio
@@ -226,11 +279,16 @@ var Script = function(){
 var Camera = function(){
 	var Camera = function(parent,paramMap){
 		this._super(parent,paramMap);
+
+		if(paramMap)
+		{
+			this.zoom = paramMap.zoom;
+		}
 	};
 
 	Camera.prototype = {
 		AABB:null,
-		viewportSize:$V([1920,1080]),
+		zoom:$V([1,1]),
 		type:ComponentType.Camera,
 		instantiate:function(parent,paramMap){
 			return new Camera(parent,paramMap);
@@ -245,6 +303,9 @@ var Camera = function(){
 //Animations
 var Animation = function(){
 	var Animation = function(parent,paramMap){
+		this._super(parent,paramMap);
+
+
 		if(paramMap)
 		{
 			this.componentType = paramMap.componentType;
@@ -282,9 +343,9 @@ var Animation = function(){
 		stop:function(){
 			this.running = false;
 		},
-		update:function(gameObject,gameTime){
+		update:function(gameTime){
 			if(!this.component || this.component.type != this.componentType)
-				this.component = gameObject.getComponentByType(this.componentType);
+				this.component = this.parent.getComponentByType(this.componentType);
 
 			if(this.component)
 				this.component[this.property] = this.getFrame(gameTime);

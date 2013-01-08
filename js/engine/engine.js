@@ -20,7 +20,7 @@ var Engine = function(){
 				},
 				update:function(){
 					var newTime = new Date();
-					this.deltaTime = newTime - this.now;
+					this.deltaTime = (newTime - this.now) / 1000; //Convert to seconds
 					this.now = newTime;
 				},
 				deltaTime:null

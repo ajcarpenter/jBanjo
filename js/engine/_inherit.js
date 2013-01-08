@@ -7,7 +7,7 @@ var _inherit = function(derived, base) {
     
     // Add _base and _super to the new prototype
     newPrototype._base = base.prototype;
-    newPrototype._super = base;
+    newPrototype._super = base.prototype._super || base; //A hack for deriving objects from derived objects. Always use the root constructor.
     
     // Assign the new prototype
     for(var p in newPrototype)
