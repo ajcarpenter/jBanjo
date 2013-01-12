@@ -3,7 +3,7 @@ var Scene = function(){
 	var Scene = function(activeCamera,gameObjects){
 		this.activeCamera = activeCamera;
 		this.gameObjects = gameObjects;
-		this.collision = new Collision(100,3);
+		this.collision = new Collision({x:100,y:100},3);
 	};
 	
 	Scene.prototype = {
@@ -12,10 +12,11 @@ var Scene = function(){
 			collision:null,
 			origin:new Transform(),
 			update:function(gameTime){
-				this.collision.reset();
-
-				Messenger.broadcast('build collision',this.collision);
 				Messenger.broadcast('tick',gameTime);
+
+				this.collision.reset();
+				Messenger.broadcast('build collision',this.collision);
+				Messenger.broadcast('check collision',this.collision);
 			},
 			draw:function(drawBatch){
 				drawBatch.camera = this.activeCamera;

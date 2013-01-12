@@ -1,7 +1,8 @@
 var Prefab = function(){
-	var Prefab = function(components,children){
+	var Prefab = function(components,paramMap,children){
 		this.components = new Array();
 		this.childObjects = new Array();
+		this.paramMap = paramMap;
 
 		this.drawable = [];
 
@@ -78,7 +79,7 @@ var Prefab = function(){
 		},
 		removeTag:function(tag)
 		{
-			
+
 		}
 	};
 	

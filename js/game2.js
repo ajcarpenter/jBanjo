@@ -51,7 +51,7 @@ var cameraParamMap = {
 
 var cameraObj = cameraPrefab.instantiate(cameraParamMap);
 
-var shipObj = new Prefab([new SpriteRenderer(), new Script(), new Animation()]);
+var shipObj = new Prefab([new SpriteRenderer(), new Script(), new Animation(), new Collider()]);
 
 var paramMap2;
 
@@ -59,9 +59,13 @@ var gameObjects = [];
 
 gameObjects.push(cameraObj);
 
-for(var i = 0; i < 100; i++)
+for(var i = 0; i < 10; i++)
 {
 	paramMap2 = {
+		collider:{
+			width:60,
+			height:60
+		},
 		animation:{
 			keyFrameSets:[
 				[

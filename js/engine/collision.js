@@ -44,7 +44,7 @@ var Collision = function(){
 		cellSize:null,
 		queryRadius:null,
 		add:function(gameObject,AABB){
-			var cell = _getCell(AABB.center);
+			var cell = this._getCell(AABB.center);
 
 			if(!this._cells[cell.x])
 				this._cells[cell.x] = [];
@@ -57,19 +57,22 @@ var Collision = function(){
 		getCollisions:function(gameObject,AABB){
 			var collidingWith = [];
 
-			var cell = _getCell(AABB.center);
+			var cell = this._getCell(AABB.center);
 
 			for(var i = cell.x - this.queryRadius; i < cell.x + this.queryRadius; i++)
 			{
-				for(var j = cell.y - this.queryRadius; j < cell.y + this.queryRadius; j++)
+				if(this._cells[i])
 				{
-					if(this._cells[i][j])
+					for(var j = cell.y - this.queryRadius; j < cell.y + this.queryRadius; j++)
 					{
-						for(var k = 0; k < this._cells[i][j].length; k++)
+						if(this._cells[i][j])
 						{
-							if(this._cells[i][j][k].obj != gameObject && AABB.intersectsAABB(this._cells[i][j][k].AABB))
+							for(var k = 0; k < this._cells[i][j].length; k++)
 							{
-								collidingWith.push(this._cells[i][j][k].obj);
+								if(this._cells[i][j][k].obj != gameObject && AABB.intersectsAABB(this._cells[i][j][k].AABB))
+								{
+									collidingWith.push(this._cells[i][j][k].obj);
+								}
 							}
 						}
 					}
@@ -79,7 +82,7 @@ var Collision = function(){
 			return collidingWith;
 		},
 		reset:function(){
-			cells:[];
+			this._cells = [];
 		},
 		_getCell:function(position){
 			return {

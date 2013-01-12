@@ -3,6 +3,7 @@ var ComponentType = {
 	SpriteRenderer:'spriteRenderer',
 	PolyRenderer:'polyRenderer',
 	ParticleRenderer:'particleRenderer',
+	Collider:'collider',
 	SquareCollider:'squareCollider',
 	CircleCollider:'circleCollider',
 	AudioEmitter:'audioEmitter',
@@ -198,6 +199,7 @@ var Collider = function(){
 	};
 	
 	Collider.prototype = {
+		type:ComponentType.Collider,
 		width:null,
 		height:null,
 		AABB:null,
@@ -205,6 +207,7 @@ var Collider = function(){
 			var collider = new Collider(parent,paramMap);
 			
 			Messenger.addListener('build collision',collider.onBuildCollision,collider);
+			Messenger.addListener('check collision',collider.onCheckCollision,collider);
 			Messenger.addListener('tick',collider.update,collider);
 
 			return collider;
@@ -214,12 +217,16 @@ var Collider = function(){
 				this.AABB = new AABB(this.parent.transform.position,$V([this.width/2,this.height/2]));
 			else
 			{
-				this.AABB.center = this.parent.transform;
+				this.AABB.center = this.parent.transform.position;
 			}
 		},
 		onBuildCollision:function(collision){
 			collision.add(this.parent,this.AABB);
-		}
+		},
+		onCheckCollision:function(collision){
+			if(collision.getCollisions(this.parent,this.AABB).length > 0)
+				console.log('BANG');
+		},		
 	};
 	
 	_inherit(Collider,Component);
@@ -384,7 +391,7 @@ var Animation = function(){
 				if(t >= this.length && this.loop)
 				{
 					this.currentFrame = 0;
-					this.loopStart = new Date();
+					this.loopStart = performance.now();
 				}
 				else
 				{
