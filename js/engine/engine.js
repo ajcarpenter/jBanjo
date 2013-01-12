@@ -16,10 +16,10 @@ var Engine = function(){
 				started:null,
 				now:null,
 				start:function(){
-					this.started = new Date();
+					this.started = performance.now();
 				},
 				update:function(){
-					var newTime = new Date();
+					var newTime = performance.now();
 					this.deltaTime = (newTime - this.now) / 1000; //Convert to seconds
 					this.now = newTime;
 				},

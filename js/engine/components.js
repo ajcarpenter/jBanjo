@@ -17,12 +17,21 @@ var Component = function(){
 	};
 	
 	Component.prototype = {
-		//TODO:Store owning gameobject somewhere
 		gameObject:null,
 		type:null,
 		enabled:true,
+		parent:null,
 		instantiate:function(parent,paramMap){
 			return new Component(parent,paramMap);
+		},
+		enable:function(){
+
+		},
+		disable:function(){
+
+		},
+		destroy:function(){
+
 		}
 	};
 	
@@ -192,18 +201,24 @@ var Collider = function(){
 		width:null,
 		height:null,
 		AABB:null,
-		update:function(gameTime,collisionTree){
+		instantiate:function(parent,paramMap){	
+			var collider = new Collider(parent,paramMap);
+			
+			Messenger.addListener('build collision',collider.onBuildCollision,collider);
+			Messenger.addListener('tick',collider.update,collider);
+
+			return collider;
+		},
+		update:function(gameTime){
 			if(!this.AABB)
 				this.AABB = new AABB(this.parent.transform.position,$V([this.width/2,this.height/2]));
 			else
 			{
 				this.AABB.center = this.parent.transform;
 			}
-
-			collisionTree.insert(this);
 		},
-		onAABBCollision:function(){
-
+		onBuildCollision:function(collision){
+			collision.add(this.parent,this.AABB);
 		}
 	};
 	
@@ -258,15 +273,22 @@ var Script = function(){
 				}
 			}
 		}
+
+		this.variables = {};
 	};
 
 	Script.prototype = {
 		instantiate:function(parent,paramMap){
-			return new Script(parent,paramMap);
+			var script = new Script(parent,paramMap);
+
+			Messenger.addListener('tick',script.update,script);
+
+			return script;
 		},
 		script:null,
 		update:function(){},
 		start:function(){},
+		variables:null,
 		type:ComponentType.Script
 	};
 
@@ -319,7 +341,11 @@ var Animation = function(){
 
 	Animation.prototype = {
 		instantiate:function(parent,paramMap){
-			return new Animation(parent,paramMap);
+			var anim = new Animation(parent,paramMap);
+
+			Messenger.addListener('tick',anim.update,anim);
+
+			return anim;
 		},
 		type:ComponentType.Animation,
 		length:null,

@@ -3,21 +3,19 @@ var Scene = function(){
 	var Scene = function(activeCamera,gameObjects){
 		this.activeCamera = activeCamera;
 		this.gameObjects = gameObjects;
+		this.collision = new Collision(100,3);
 	};
 	
 	Scene.prototype = {
 			gameObjects:[],
 			activeCamera:null,
-			collisionQT:null,
+			collision:null,
 			origin:new Transform(),
 			update:function(gameTime){
-				// this.collisionQT = new QuadTree()
+				this.collision.reset();
 
-				for(var i = 0; i < this.gameObjects.length; i++)
-				{
-					if(this.gameObjects[i].updateable)
-						this.gameObjects[i].update(gameTime,this.collisionQT);
-				}
+				Messenger.broadcast('build collision',this.collision);
+				Messenger.broadcast('tick',gameTime);
 			},
 			draw:function(drawBatch){
 				drawBatch.camera = this.activeCamera;

@@ -27,6 +27,7 @@ var Prefab = function(){
 		loadable:false,
 		startable:false,
 		stoppable:false,
+		tags:[],
 		instantiate:function(paramMap){
 			//paramMap = {componentName:{paramName:value}}
 			
@@ -68,6 +69,16 @@ var Prefab = function(){
 		enableComponent:function(i)
 		{
 
+		},
+		addTag:function(tag){
+			if(!this.tags)
+				this.tags = [];
+
+			this.tags.push(tag);
+		},
+		removeTag:function(tag)
+		{
+			
 		}
 	};
 	

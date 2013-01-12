@@ -27,19 +27,6 @@ var GameObject = function(){
 	};
 	
 	GameObject.prototype = {
-			update:function(gameTime,collisionTree){
-				for(var i = 0; i < this.components.length; i++)
-				{
-					if(this.components[i].update)
-						this.components[i].update(gameTime,collisionTree);
-				}
-
-				for(var i = 0; i < this.childObjects.length; i++)
-				{
-					if(this.childObjects[i].updateable)
-						this.childObjects[i].update(gameTime,collisionTree);
-				}
-			},
 			draw:function(drawBatch,parentTransform){
 				var trans = this.transform.toWorld(parentTransform);
 
@@ -96,6 +83,9 @@ var GameObject = function(){
 
 				if(this.loading.length === 0)
 					this.loadInitiator.registerLoad(this);
+			},
+			destroy:function(){
+
 			}
 
 	};
