@@ -53,18 +53,20 @@ var cameraObj = cameraPrefab.instantiate(cameraParamMap);
 
 var shipObj = new Prefab([new SpriteRenderer(), new Script(), new Animation(), new Collider()]);
 
+var explObj = new Prefab([new SpriteRenderer(), new Animation]);
+
 var paramMap2;
 
 var gameObjects = [];
 
 gameObjects.push(cameraObj);
 
-for(var i = 0; i < 10; i++)
+for(var i = 0; i < 100; i++)
 {
 	paramMap2 = {
 		collider:{
-			width:60,
-			height:60
+			width:40,
+			height:40
 		},
 		animation:{
 			keyFrameSets:[
@@ -129,6 +131,11 @@ for(var i = 0; i < 10; i++)
 				var step = this.direction.x(this.speed);
 
 				this.parent.transform.position = this.parent.transform.position.add(step);
+			},
+			onCollisionEnter:function(obj){
+				console.log('Hit something at ' + performance.now());
+
+				this.parent.destroy();
 			}
 		}
 	};

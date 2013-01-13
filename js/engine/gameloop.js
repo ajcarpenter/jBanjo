@@ -28,7 +28,7 @@ var GameLoop = function(){
 			self.draw(drawBatch);
 			self.renderer.draw(drawBatch);
 
-			window.requestAnimationFrame(function(){self.loop();});
+			window.requestAnimationFrame(this.loop.bind(this));
 		},
 		update:function(gameTime){
 			if(this.scene)

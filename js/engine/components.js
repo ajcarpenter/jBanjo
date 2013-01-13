@@ -212,6 +212,11 @@ var Collider = function(){
 
 			return collider;
 		},
+		destroy:function(){
+			Messenger.removeListener('build collision',this.onBuildCollision,this);
+			Messenger.removeListener('check collision',this.onCheckCollision,this);
+			Messenger.removeListener('tick',this.update,this);
+		},
 		update:function(gameTime){
 			if(!this.AABB)
 				this.AABB = new AABB(this.parent.transform.position,$V([this.width/2,this.height/2]));
@@ -224,8 +229,23 @@ var Collider = function(){
 			collision.add(this.parent,this.AABB);
 		},
 		onCheckCollision:function(collision){
-			if(collision.getCollisions(this.parent,this.AABB).length > 0)
-				console.log('BANG');
+			var lastCollidingWith = this.collidingWith;
+			this.collidingWith = collision.getCollisions(this.parent,this.AABB);
+
+			if(this.collidingWith.length > 0)
+			{
+				if(this.parent.script.onCollisionStay)
+					this.parent.script.onCollisionStay(this.collidingWith);
+
+				if(lastCollidingWith && this.parent.script.onCollisionEnter)
+				{
+					for(var i in this.collidingWith)
+					{
+						if(lastCollidingWith.indexOf(this.collidingWith[i]) === -1)
+							this.parent.script.onCollisionEnter(this.collidingWith[i]);
+					}
+				}
+			}
 		},		
 	};
 	
@@ -289,8 +309,13 @@ var Script = function(){
 			var script = new Script(parent,paramMap);
 
 			Messenger.addListener('tick',script.update,script);
+			Messenger.addListener('start',script.start,script);
 
 			return script;
+		},
+		destroy:function(){
+			Messenger.removeListener('tick',this.update,this);
+			Messenger.removeListener('start',this.start,this);
 		},
 		script:null,
 		update:function(){},
@@ -343,6 +368,7 @@ var Animation = function(){
 			this.keyFrameSets = paramMap.keyFrameSets;
 			this.loop = paramMap.loop;
 			this.defaultVal = paramMap.defaultVal;
+			this.onComplete = paramMap.onComplete;
 		}
 	};
 
@@ -351,8 +377,13 @@ var Animation = function(){
 			var anim = new Animation(parent,paramMap);
 
 			Messenger.addListener('tick',anim.update,anim);
+			Messenger.addListener('start',anim.start,anim);
 
 			return anim;
+		},
+		destroy:function(){
+			Messenger.removeListener('tick',this.update,this);
+			Messenger.removeListener('start',this.start,this);
 		},
 		type:ComponentType.Animation,
 		length:null,
@@ -368,8 +399,8 @@ var Animation = function(){
 		defaultVal:0,
 		loadedSet:0,
 		start:function(){
-			this.startTime = new Date();
-			this.loopStart = new Date();
+			this.startTime = performance.now();
+			this.loopStart = performance.now();
 			this.currentFrame = 0;
 			this.running = true;
 		},

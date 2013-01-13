@@ -4,6 +4,8 @@ var Scene = function(){
 		this.activeCamera = activeCamera;
 		this.gameObjects = gameObjects;
 		this.collision = new Collision({x:100,y:100},3);
+
+		Messenger.addListener('destroy object',this.onDestroyObject,this);
 	};
 	
 	Scene.prototype = {
@@ -44,11 +46,7 @@ var Scene = function(){
 				}	
 			},
 			start:function(){
-				for(var i = 0; i < this.gameObjects.length; i++)
-				{
-					if(this.gameObjects[i].startable)
-						this.gameObjects[i].start();
-				}
+				Messenger.broadcast('start');
 			},
 			registerLoad:function(loadedObject){
 				this.loading.splice(this.loading.indexOf(loadedObject),1);
@@ -58,6 +56,12 @@ var Scene = function(){
 
 				if(this.loading.length === 0)
 					this.loadInitiator.start(this);
+			},
+			onDestroyObject:function(obj){
+				this.gameObjects.splice(this.gameObjects.indexOf(obj),1);
+			},
+			addGameObject:function(obj){
+				
 			}
 	};
 	

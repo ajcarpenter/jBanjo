@@ -43,19 +43,6 @@ var GameObject = function(){
 
 				return drawBatch;
 			},
-			start:function(){
-				for(var i = 0; i < this.components.length; i++)
-				{
-					if(this.components[i].start)
-						this.components[i].start(this);
-				}
-
-				for(var i = 0; i < this.childObjects.length; i++)
-				{
-					if(this.childObjects[i].startable)
-						this.childObjects[i].start();
-				}
-			},
 			load:function(loadInitiator){
 				this.loading = [];
 				this.loadInitiator = loadInitiator;
@@ -85,7 +72,12 @@ var GameObject = function(){
 					this.loadInitiator.registerLoad(this);
 			},
 			destroy:function(){
+				for(var i = 0; i < this.components.length; i++)
+				{
+					this.components[i].destroy();
+				}
 
+				Messenger.broadcast('destroy object',this);
 			}
 
 	};
