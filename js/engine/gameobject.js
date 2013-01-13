@@ -1,9 +1,9 @@
 var GameObject = function(){
 	var GameObject = function(prefab,paramMap){
-		this.paramMap = paramMap;
+		
 		this.components = [];
 		this.childObjects = [];
-
+		this.paramMap = paramMap;
 		this.drawable = [];
 
 		if(prefab)

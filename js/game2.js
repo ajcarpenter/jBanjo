@@ -51,19 +51,9 @@ var cameraParamMap = {
 
 var cameraObj = cameraPrefab.instantiate(cameraParamMap);
 
-var shipObj = new Prefab([new SpriteRenderer(), new Script(), new Animation(), new Collider()]);
-
-var explObj = new Prefab([new SpriteRenderer(), new Animation]);
-
-var paramMap2;
-
-var gameObjects = [];
-
-gameObjects.push(cameraObj);
-
-for(var i = 0; i < 100; i++)
-{
-	paramMap2 = {
+var shipObj = new Prefab(
+	[new SpriteRenderer(), new Script(), new Animation(), new Collider()],
+	{
 		collider:{
 			width:40,
 			height:40
@@ -85,9 +75,6 @@ for(var i = 0; i < 100; i++)
 			zindex:2,
 			src:'./sprites/shipanim.png',
 			spriteSheetSize:{x:3,y:1}
-		},
-		transform:{
-			position:$V([Math.random() * 1600, Math.random() * 1200])
 		},
 		script:{
 			start:function(){
@@ -138,8 +125,24 @@ for(var i = 0; i < 100; i++)
 				this.parent.destroy();
 			}
 		}
-	};
-	gameObjects.push(shipObj.instantiate(paramMap2));
+	}
+);
+
+var explPrefab = new Prefab([new SpriteRenderer(), new Animation]);
+
+var paramMap2;
+
+var gameObjects = [];
+
+gameObjects.push(cameraObj);
+
+for(var i = 0; i < 100; i++)
+{
+	gameObjects.push(shipObj.instantiate({		
+		transform:{
+			position:$V([Math.random() * 1600, Math.random() * 1200])
+		}
+	}));
 }
 
 var scene = new Scene(cameraObj,gameObjects);

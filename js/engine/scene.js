@@ -1,6 +1,6 @@
 //Collection of gameobjects
 var Scene = function(){
-	var Scene = function(activeCamera,gameObjects){
+	var Scene = function(activeCamera,gameObjects,assets){
 		this.activeCamera = activeCamera;
 		this.gameObjects = gameObjects;
 		this.collision = new Collision({x:100,y:100},3);
@@ -61,7 +61,7 @@ var Scene = function(){
 				this.gameObjects.splice(this.gameObjects.indexOf(obj),1);
 			},
 			addGameObject:function(obj){
-				
+
 			}
 	};
 	

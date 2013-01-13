@@ -31,8 +31,28 @@ var Prefab = function(){
 		tags:[],
 		instantiate:function(paramMap){
 			//paramMap = {componentName:{paramName:value}}
-			
+			paramMap = this._processParamOverrides(this.paramMap,paramMap);
+
 			return new GameObject(this,paramMap);
+		},
+		_processParamOverrides:function(prefabParamMap,objParamMap){
+			var paramMap = prefabParamMap || {};
+
+			for(var i in objParamMap)
+			{
+				if(!paramMap[i])
+					paramMap[i] = {};
+
+				for(var j in objParamMap[i])
+				{
+					if(i === 'children')
+						paramMap[i][j] = this._processParamOverrides(prefabParamMap[i][j],objParamMap[i][j]);
+					else
+						paramMap[i][j] = objParamMap[i][j];
+				}
+			}
+
+			return paramMap;
 		},
 		getComponentByType:function(componentType){
 			for(var i = 0; i < this.components.length; i++)
