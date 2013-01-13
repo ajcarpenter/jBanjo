@@ -43,34 +43,6 @@ var GameObject = function(){
 
 				return drawBatch;
 			},
-			load:function(loadInitiator){
-				this.loading = [];
-				this.loadInitiator = loadInitiator;
-
-				for(var i = 0; i < this.components.length; i++)
-				{
-					if(this.components[i].load)
-					{
-						this.components[i].load(this);
-						this.loading.push(this.components[i]);
-					}
-				}
-
-				for(var i = 0; i < this.childObjects.length; i++)
-				{
-					if(this.childObjects[i].loadable)
-					{
-						this.childObjects[i].load(this);
-						this.loading.push(this.childObjects[i]);
-					}
-				}
-			},
-			registerLoad:function(loadedObject){
-				this.loading.splice(this.loading.indexOf(loadedObject),1);
-
-				if(this.loading.length === 0)
-					this.loadInitiator.registerLoad(this);
-			},
 			destroy:function(){
 				for(var i = 0; i < this.components.length; i++)
 				{

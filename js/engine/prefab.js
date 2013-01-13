@@ -1,7 +1,7 @@
 var Prefab = function(){
 	var Prefab = function(components,paramMap,children){
-		this.components = new Array();
-		this.childObjects = new Array();
+		this.components = [];
+		this.childObjects = [];
 		this.paramMap = paramMap;
 
 		this.drawable = [];
@@ -10,6 +10,8 @@ var Prefab = function(){
 		{
 			for(var i = 0; i < components.length; i++)
 			{
+				if(paramMap)
+					components[i].setProperties(paramMap[components[i].type]);
 				this.addComponent(components[i]);
 			}
 		}
@@ -100,6 +102,34 @@ var Prefab = function(){
 		removeTag:function(tag)
 		{
 
+		},
+		load:function(loadInitiator){
+			this.loading = [];
+			this.loadInitiator = loadInitiator;
+
+			for(var i = 0; i < this.components.length; i++)
+			{
+				if(this.components[i].load)
+				{
+					this.components[i].load(this);
+					this.loading.push(this.components[i]);
+				}
+			}
+
+			for(var i = 0; i < this.childObjects.length; i++)
+			{
+				if(this.childObjects[i].loadable)
+				{
+					this.childObjects[i].load(this);
+					this.loading.push(this.childObjects[i]);
+				}
+			}
+		},
+		registerLoad:function(loadedObject){
+			this.loading.splice(this.loading.indexOf(loadedObject),1);
+
+			if(this.loading.length === 0)
+				this.loadInitiator.registerLoad(this);
 		}
 	};
 	

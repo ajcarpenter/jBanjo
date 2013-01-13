@@ -1,8 +1,9 @@
 //Collection of gameobjects
 var Scene = function(){
-	var Scene = function(activeCamera,gameObjects,assets){
+	var Scene = function(activeCamera,gameObjects,prefabs){
 		this.activeCamera = activeCamera;
-		this.gameObjects = gameObjects;
+		this.gameObjects = gameObjects || [];
+		this.prefabs = prefabs || [];
 		this.collision = new Collision({x:100,y:100},3);
 
 		Messenger.addListener('destroy object',this.onDestroyObject,this);
@@ -44,6 +45,16 @@ var Scene = function(){
 						this.loadingCount++;
 					}
 				}	
+
+				for(var i = 0; i < this.prefabs.length; i++)
+				{
+					if(this.prefabs[i].loadable)
+					{
+						this.prefabs[i].load(this);
+						this.loading.push(this.prefabs[i]);
+						this.loadingCount++;
+					}
+				}	
 			},
 			start:function(){
 				Messenger.broadcast('start');
@@ -61,7 +72,7 @@ var Scene = function(){
 				this.gameObjects.splice(this.gameObjects.indexOf(obj),1);
 			},
 			addGameObject:function(obj){
-
+				this.gameObjects.push(obj);
 			}
 	};
 	

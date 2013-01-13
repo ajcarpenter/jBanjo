@@ -15,6 +15,8 @@ var ComponentType = {
 var Component = function(){
 	var Component = function(parent,paramMap){
 		this.parent = parent;
+
+		this.setProperties(paramMap);
 	};
 	
 	Component.prototype = {
@@ -33,6 +35,9 @@ var Component = function(){
 		},
 		destroy:function(){
 
+		},
+		setProperties:function(paramMap){
+
 		}
 	};
 	
@@ -43,24 +48,25 @@ var Component = function(){
 var Transform = function(){
 	var Transform = function(parent,paramMap){
 		this._super(parent,paramMap);
-
-		if(paramMap)
-		{
-			this.position = paramMap.position || $V([0,0]);
-			this.scale = paramMap.scale || $V([1,1]);
-			this.rotation = paramMap.rotation || 0; //radians
-		}
-		else
-		{
-			this.position = $V([0,0]);
-			this.scale = $V([1,1]);
-			this.rotation = 0;
-		}
 	};
 	
 	Transform.prototype = {
 		instantiate:function(parent,paramMap){
 			return new Transform(parent,paramMap);
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				this.position = paramMap.position || $V([0,0]);
+				this.scale = paramMap.scale || $V([1,1]);
+				this.rotation = paramMap.rotation || 0; //radians
+			}
+			else
+			{
+				this.position = $V([0,0]);
+				this.scale = $V([1,1]);
+				this.rotation = 0;
+			}
 		},
 		type:ComponentType.Transform,
 		position:null,
@@ -109,20 +115,30 @@ var Renderer = function(){
 var SpriteRenderer = function(){
 	var SpriteRenderer = function(parent,paramMap){
 		this._super(parent,paramMap);
-
-		if(paramMap)
-		{
-			this.zindex = paramMap.zindex;
-			this.src = paramMap.src;//'./sprites/gb_walk.png';
-			this.spriteSheetSize = paramMap.spriteSheetSize;
-		}
-
-		this.AABB = new AABB();
 	};
 	
 	SpriteRenderer.prototype = {
 		instantiate:function(parent,paramMap){
-			return new SpriteRenderer(parent,paramMap);
+			var spriteRenderer = new SpriteRenderer(parent,paramMap);
+			
+			if(this.loaded)
+			{
+				spriteRenderer.spriteSheet = this.spriteSheet;
+				spriteRenderer.width = this.width;
+				spriteRenderer.height = this.height;
+			}
+
+			return spriteRenderer;
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				this.zindex = paramMap.zindex;
+				this.src = paramMap.src;//'./sprites/gb_walk.png';
+				this.spriteSheetSize = paramMap.spriteSheetSize;
+			}
+
+			this.AABB = new AABB();
 		},
 		type:ComponentType.SpriteRenderer,
 		spriteSheet:null,
@@ -161,7 +177,8 @@ var SpriteRenderer = function(){
 			ResourceManager.get(ResourceType.image, this.src, function(data){
 				self.spriteSheet = data;
 				self.width = Math.floor(data.width / self.spriteSheetSize.x);
-				self.height = Math.floor(data.height / self.spriteSheetSize.y)
+				self.height = Math.floor(data.height / self.spriteSheetSize.y);
+				self.loaded = true;
 				loadInitiator.registerLoad(self);
 			});
 		},
@@ -188,14 +205,6 @@ var ParticleRenderer = function(){
 var Collider = function(){
 	var Collider = function(parent,paramMap){
 		this._super(parent,paramMap);
-
-		if(paramMap)
-		{
-			this.width = paramMap.width;
-			this.height = paramMap.height;
-		}
-
-
 	};
 	
 	Collider.prototype = {
@@ -211,6 +220,13 @@ var Collider = function(){
 			Messenger.addListener('tick',collider.update,collider);
 
 			return collider;
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				this.width = paramMap.width;
+				this.height = paramMap.height;
+			}
 		},
 		destroy:function(){
 			Messenger.removeListener('build collision',this.onBuildCollision,this);
@@ -284,24 +300,6 @@ var AudioEmitter = function(){
 var Script = function(){
 	var Script = function(parent,paramMap){
 		this._super(parent,paramMap);
-		
-		if(paramMap)
-		{
-			for(var i in paramMap)
-			{
-				this[i] = paramMap[i];
-			}
-
-			if(paramMap.listeners)
-			{
-				for(var i in paramMap.listeners)
-				{
-					Messenger.addListener(paramMap.listeners[i].signature,this[paramMap.listeners[i].func],this);
-				}
-			}
-		}
-
-		this.variables = {};
 	};
 
 	Script.prototype = {
@@ -311,7 +309,23 @@ var Script = function(){
 			Messenger.addListener('tick',script.update,script);
 			Messenger.addListener('start',script.start,script);
 
+			for(var i in this.listeners)
+			{
+				Messenger.addListener(script.listeners[i].signature,script[script.listeners[i].func],script);
+			}
+
 			return script;
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				for(var i in paramMap)
+				{
+					this[i] = paramMap[i];
+				}
+			}
+
+			this.variables = {};
 		},
 		destroy:function(){
 			Messenger.removeListener('tick',this.update,this);
@@ -333,11 +347,6 @@ var Script = function(){
 var Camera = function(){
 	var Camera = function(parent,paramMap){
 		this._super(parent,paramMap);
-
-		if(paramMap)
-		{
-			this.zoom = paramMap.zoom;
-		}
 	};
 
 	Camera.prototype = {
@@ -346,6 +355,12 @@ var Camera = function(){
 		type:ComponentType.Camera,
 		instantiate:function(parent,paramMap){
 			return new Camera(parent,paramMap);
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				this.zoom = paramMap.zoom;
+			}
 		}
 	};
 
@@ -358,18 +373,6 @@ var Camera = function(){
 var Animation = function(){
 	var Animation = function(parent,paramMap){
 		this._super(parent,paramMap);
-
-
-		if(paramMap)
-		{
-			this.componentType = paramMap.componentType;
-			this.property = paramMap.property;
-			this.length = paramMap.length;
-			this.keyFrameSets = paramMap.keyFrameSets;
-			this.loop = paramMap.loop;
-			this.defaultVal = paramMap.defaultVal;
-			this.onComplete = paramMap.onComplete;
-		}
 	};
 
 	Animation.prototype = {
@@ -380,6 +383,18 @@ var Animation = function(){
 			Messenger.addListener('start',anim.start,anim);
 
 			return anim;
+		},
+		setProperties:function(paramMap){
+			if(paramMap)
+			{
+				this.componentType = paramMap.componentType;
+				this.property = paramMap.property;
+				this.length = paramMap.length;
+				this.keyFrameSets = paramMap.keyFrameSets;
+				this.loop = paramMap.loop;
+				this.defaultVal = paramMap.defaultVal;
+				this.onComplete = paramMap.onComplete;
+			}
 		},
 		destroy:function(){
 			Messenger.removeListener('tick',this.update,this);
@@ -406,6 +421,10 @@ var Animation = function(){
 		},
 		stop:function(){
 			this.running = false;
+			this.currentFrame = this.defaultVal;
+
+			if(this.onComplete)
+				this.onComplete();
 		},
 		update:function(gameTime){
 			if(!this.component || this.component.type != this.componentType)
@@ -419,10 +438,17 @@ var Animation = function(){
 			{
 				var t = (gameTime.now - this.loopStart);
 
-				if(t >= this.length && this.loop)
+				if(t >= this.length)
 				{
-					this.currentFrame = 0;
-					this.loopStart = performance.now();
+					if(this.loop)
+					{
+						this.currentFrame = 0;
+						this.loopStart = performance.now();
+					}
+					else
+					{
+						this.stop();
+					}
 				}
 				else
 				{
