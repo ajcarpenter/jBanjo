@@ -27,18 +27,21 @@ var GameObject = function(){
 	};
 	
 	GameObject.prototype = {
-			draw:function(drawBatch,parentTransform){
+			draw:function(drawBatch,parentTransform,bounds){
 				var trans = this.transform.toWorld(parentTransform);
 
-				for(var i = 0; i < this.drawable.length; i++)
-				{
-					this.components[i].draw(drawBatch,trans);
-				}
+				// if(bounds.containsPoint(trans.position))
+				// {
+					for(var i = 0; i < this.drawable.length; i++)
+					{
+						this.components[i].draw(drawBatch,trans,bounds);
+					}
+				// }
 
 				for(var i = 0; i < this.childObjects.length; i++)
 				{
 					if(this.childObjects[i].drawable.length > 0)
-						this.childObjects[i].draw(drawBatch,trans);
+						this.childObjects[i].draw(drawBatch,trans,bounds);
 				}
 
 				return drawBatch;
