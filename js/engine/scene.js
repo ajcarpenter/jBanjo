@@ -25,10 +25,14 @@ var Scene = function(){
 				drawBatch.camera = this.activeCamera;
 				drawBatch.objects = [];
 
+				var bounds = drawBatch.camera.camera.getVisibleAABB();
+
+				drawBatch.bounds = bounds;
+
 				for(var i = 0; i < this.gameObjects.length; i++)
 				{
 					if(this.gameObjects[i].drawable)
-						this.gameObjects[i].draw(drawBatch,this.origin);
+						this.gameObjects[i].draw(drawBatch,this.origin,bounds);
 				}
 			},
 			load:function(loadInitiator){

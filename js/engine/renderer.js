@@ -64,6 +64,20 @@ var Renderer = function(){
 				}
 			}
 
+			//START:DEBUGGING
+			this.context.save();
+
+			this.context.strokeStyle='#66FF66';
+			this.context.strokeRect(
+				drawBatch.bounds.center.elements[0] - drawBatch.bounds.halfDimension.elements[0],
+				drawBatch.bounds.center.elements[1] - drawBatch.bounds.halfDimension.elements[1],
+				drawBatch.bounds.halfDimension.elements[0] * 2,
+				drawBatch.bounds.halfDimension.elements[1] * 2
+			);
+
+			this.context.restore();
+			//START:END DEBUGGING			
+
 			this.context.restore();
 		}
 
