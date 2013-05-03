@@ -4,7 +4,11 @@ var cameraPrefab = new Prefab(
 	[new Camera(), new Script()],
 	{
 		camera:{
-			zoom:$V([0.5,0.5])
+			zoom:$V([0.5,0.5]),
+			canvasSize:{
+				width:800,
+				height:600
+			}
 		},
 		transform:{
 			position:$V([300,300])
@@ -175,11 +179,23 @@ var explPrefab = new Prefab([new SpriteRenderer(), new Animation()],{
 	}
 });
 
-var paramMap2;
+var starfieldPrefab = new Prefab([new SpriteRenderer()],{
+	spriteRenderer:{
+		zindex:0,
+		src:'./sprites/starfield.jpg',
+		spriteSheetSize:{x:1,y:1},
+		viewSpace:true
+	},
+	transform:{
+		position:$V([656,443]),
+		scale:$V([2,2])
+	}
+});
 
 var gameObjects = [];
 
 gameObjects.push(cameraObj);
+gameObjects.push(starfieldPrefab.instantiate());
 
 for(var i = 0; i < 100; i++)
 {

@@ -136,6 +136,7 @@ var SpriteRenderer = function(){
 				this.zindex = paramMap.zindex;
 				this.src = paramMap.src;//'./sprites/gb_walk.png';
 				this.spriteSheetSize = paramMap.spriteSheetSize;
+				this.tiled = paramMap.tiled;
 			}
 
 			this.AABB = new AABB();
@@ -148,8 +149,8 @@ var SpriteRenderer = function(){
 		width:null,
 		height:null,
 		src:null,
+		tiled:false,
 		draw:function(drawBatch,transform){
-			
 			if(!drawBatch.objects[this.zindex])
 				drawBatch.objects[this.zindex] = [];
 
@@ -360,7 +361,39 @@ var Camera = function(){
 			if(paramMap)
 			{
 				this.zoom = paramMap.zoom;
+				this.canvasSize = paramMap.canvasSize;
 			}
+		},
+		getVisibleAABB:function(){
+			var center = this.parent.transform.position;
+			var rot = this.parent.transform.rotation;
+			var scale = this.zoom;
+
+			var NW_MATRIX = $M([[-1,0],[0,-1]]);
+			var NE_MATRIX = $M([[1,0],[0,-1]]);
+			var SW_MATRIX = $M([[-1,0],[0,1]]);
+			var SE_MATRIX = $M([[1,0],[0,1]]);
+
+			var halfDimension = $V([
+				this.canvasSize.width * scale.e(1),
+				this.canvasSize.height * scale.e(2)
+			]).x(0.5);
+
+			var rotMatrix = Matrix.Rotation(rot);
+
+			var nw = rotMatrix.x(center.add(NW_MATRIX.x(halfDimension)));
+			var ne = rotMatrix.x(center.add(NE_MATRIX.x(halfDimension)));
+			var sw = rotMatrix.x(center.add(SW_MATRIX.x(halfDimension)));
+			var se = rotMatrix.x(center.add(SE_MATRIX.x(halfDimension)));
+
+			var minX = Math.min(nw.e(1),ne.e(1),sw.e(1),se.e(1));
+			var maxX = Math.max(nw.e(1),ne.e(1),sw.e(1),se.e(1));
+			var minY = Math.min(nw.e(2),ne.e(2),sw.e(2),se.e(2));
+			var maxY = Math.max(nw.e(2),ne.e(2),sw.e(2),se.e(2));
+
+			return new AABB(
+				$V([minX + ((maxX - minX) / 2), minY + ((maxY - minY) / 2)]),
+				$V([(maxX - minX) / 2, (maxY - minY) / 2]));
 		}
 	};
 

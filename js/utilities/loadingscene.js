@@ -1,4 +1,15 @@
-var cameraPrefab = new Prefab([new Camera()]);
+var cameraPrefab = new Prefab(
+	[new Camera()],
+	{
+		camera:{
+			zoom:$V([1,1]),
+			canvasSize:{
+				width:800,
+				height:600
+			}
+		}
+	}
+);
 
 var loadingTextPrefab = new Prefab(
 	[new SpriteRenderer()],
